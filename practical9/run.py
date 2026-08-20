@@ -1,5 +1,7 @@
 import os
 import sys
+import socket
+import argparse
 import numpy as np
 import cv2
 import torch
@@ -7,10 +9,29 @@ import torch.nn as nn
 import torch.optim as optim
 from torch.utils.data import Dataset, DataLoader
 import torchvision.transforms as transforms
-import matplotlib.pyplot as plt
 from PIL import Image, ImageDraw
 
-def main():
+def find_free_port(starting_port=8000):
+    for port in range(starting_port, starting_port + 20):
+        with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
+            if s.connect_ex(("127.0.0.1", port)) != 0:
+                return port
+    return starting_port
+
+def run_web_server():
+    import uvicorn
+    script_dir = os.path.dirname(os.path.abspath(__file__))
+    sys.path.insert(0, script_dir)
+    from app import app
+    
+    port = find_free_port(8000)
+    print("=" * 65)
+    print(" LAUNCHING AEGISVISION PUBLIC SAFETY MASK COMPLIANCE WEB APP ")
+    print(f" URL: http://127.0.0.1:{port} ")
+    print("=" * 65)
+    uvicorn.run(app, host="127.0.0.1", port=port)
+
+def run_cli_pipeline():
     print("=" * 65)
     print(" PATTERN RECOGNITION - PRACTICAL 09: FACE MASK DETECTION SYSTEM ")
     print("=" * 65)
@@ -290,4 +311,11 @@ def main():
     print("=" * 65)
 
 if __name__ == "__main__":
-    main()
+    parser = argparse.ArgumentParser(description="Practical 09 Runner")
+    parser.add_argument("--web", action="store_true", help="Launch FastAPI web server")
+    args = parser.parse_args()
+
+    if args.web:
+        run_web_server()
+    else:
+        run_cli_pipeline()

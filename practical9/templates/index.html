@@ -1,0 +1,335 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Public Safety Mask Compliance Monitor | Pattern Recognition Practical 09</title>
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Outfit:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="/static/css/style.css">
+</head>
+<body>
+    <!-- Top Glass Navigation Bar -->
+    <nav class="navbar">
+        <div class="nav-container">
+            <div class="brand">
+                <i class="fa-solid fa-shield-halved brand-icon"></i>
+                <div class="brand-text">
+                    <span class="title">AegisVision <span class="badge">PRO</span></span>
+                    <span class="subtitle">Pattern Recognition • Practical 09</span>
+                </div>
+            </div>
+            
+            <div class="nav-metrics">
+                <div class="metric-pill">
+                    <span class="pulse-dot active"></span>
+                    <span class="label">System:</span>
+                    <span class="value active-text">ONLINE</span>
+                </div>
+                <div class="metric-pill">
+                    <i class="fa-solid fa-brain"></i>
+                    <span class="label">CNN Model:</span>
+                    <span class="value glow-cyan">PyTorch (100% Acc)</span>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Container -->
+    <div class="app-container">
+        <!-- Header Banner -->
+        <header class="hero-banner">
+            <div class="hero-content">
+                <h1>Public Safety Face Mask Compliance System</h1>
+                <p>Real-time deep learning pattern recognition powered by Convolutional Neural Networks (CNN) for public area surveillance and automated safety enforcement.</p>
+            </div>
+            <div class="alert-status-banner safe" id="globalAlertBanner">
+                <i class="fa-solid fa-circle-check" id="globalAlertIcon"></i>
+                <div>
+                    <div class="status-title" id="globalStatusTitle">HIGH COMPLIANCE ZONE</div>
+                    <div class="status-desc" id="globalStatusDesc">Compliance rate meets public safety threshold (≥70%).</div>
+                </div>
+            </div>
+        </header>
+
+        <!-- Navigation Tabs -->
+        <div class="tab-nav">
+            <button class="tab-btn active" data-tab="tab-detection">
+                <i class="fa-solid fa-video"></i> Live Monitor & Detection
+            </button>
+            <button class="tab-btn" data-tab="tab-analytics">
+                <i class="fa-solid fa-chart-pie"></i> Model Analytics & Metrics
+            </button>
+            <button class="tab-btn" data-tab="tab-architecture">
+                <i class="fa-solid fa-network-wired"></i> CNN Architecture
+            </button>
+        </div>
+
+        <!-- Tab 1: Detection Dashboard -->
+        <div class="tab-content active" id="tab-detection">
+            <div class="dashboard-grid">
+                <!-- Sidebar Controls -->
+                <aside class="control-panel glass-card">
+                    <h3><i class="fa-solid fa-sliders"></i> Input Mode Selector</h3>
+                    
+                    <div class="mode-buttons">
+                        <button class="mode-btn active" id="btnModeCam">
+                            <i class="fa-solid fa-camera"></i> Live Webcam
+                        </button>
+                        <button class="mode-btn" id="btnModeSim">
+                            <i class="fa-solid fa-tower-broadcast"></i> Surveillance Feed Simulator
+                        </button>
+                        <button class="mode-btn" id="btnModeUpload">
+                            <i class="fa-solid fa-cloud-arrow-up"></i> Upload Photo
+                        </button>
+                    </div>
+
+                    <!-- Mode 1: Webcam Controls -->
+                    <div class="mode-controls" id="webcamControls">
+                        <button class="btn btn-primary btn-block" id="btnStartWebcam">
+                            <i class="fa-solid fa-play"></i> Start Camera Stream
+                        </button>
+                        <button class="btn btn-danger btn-block hidden" id="btnStopWebcam">
+                            <i class="fa-solid fa-stop"></i> Stop Camera Stream
+                        </button>
+                    </div>
+
+                    <!-- Mode 2: Upload Controls -->
+                    <div class="mode-controls hidden" id="uploadControls">
+                        <div class="drop-zone" id="dropZone">
+                            <i class="fa-solid fa-file-image drop-icon"></i>
+                            <p>Drag & drop image here or <span class="highlight">browse</span></p>
+                            <input type="file" id="fileInput" accept="image/*" class="hidden">
+                        </div>
+                    </div>
+
+                    <!-- Mode 3: Simulation Controls -->
+                    <div class="mode-controls hidden" id="simControls">
+                        <button class="btn btn-secondary btn-block" id="btnRefreshSim">
+                            <i class="fa-solid fa-arrows-rotate"></i> Generate New Public Feed
+                        </button>
+                    </div>
+
+                    <hr class="divider">
+
+                    <h3><i class="fa-solid fa-gear"></i> System Settings</h3>
+                    <div class="setting-group">
+                        <label for="confidenceThreshold">CNN Confidence Threshold: <span id="confVal">60%</span></label>
+                        <input type="range" id="confidenceThreshold" min="40" max="95" value="60" class="slider">
+                    </div>
+                    
+                    <div class="setting-group toggle-group">
+                        <label for="toggleAudioAlert"><i class="fa-solid fa-bell"></i> Audio Warning Alert</label>
+                        <input type="checkbox" id="toggleAudioAlert" class="toggle-checkbox" checked>
+                    </div>
+                </aside>
+
+                <!-- Main Viewport -->
+                <main class="viewport-card glass-card">
+                    <div class="viewport-header">
+                        <div class="stream-info">
+                            <span class="live-tag" id="streamTag"><i class="fa-solid fa-circle"></i> CAMERA STREAM</span>
+                            <span class="fps-counter" id="fpsDisplay">30 FPS</span>
+                        </div>
+                        <div class="camera-title" id="camTitle">CAM_01 • MAIN ENTRANCE HALLWAY</div>
+                    </div>
+
+                    <div class="canvas-wrapper">
+                        <!-- Hidden Video Element for Camera Capture -->
+                        <video id="videoElement" autoplay playsinline class="hidden"></video>
+                        <!-- Interactive Render Canvas -->
+                        <canvas id="outputCanvas" width="640" height="420"></canvas>
+                        
+                        <!-- Placeholder Loader -->
+                        <div class="placeholder-overlay" id="placeholderOverlay">
+                            <i class="fa-solid fa-camera-rotate placeholder-icon"></i>
+                            <h3>Select Input Stream</h3>
+                            <p>Click "Start Camera Stream" or switch to "Surveillance Feed Simulator" to begin real-time pattern recognition.</p>
+                        </div>
+                    </div>
+
+                    <!-- Real-Time Compliance Stats Bar -->
+                    <div class="compliance-stats-grid">
+                        <div class="stat-card">
+                            <div class="stat-icon icon-blue"><i class="fa-solid fa-users"></i></div>
+                            <div class="stat-details">
+                                <span class="stat-number" id="statTotal">0</span>
+                                <span class="stat-label">People Monitored</span>
+                            </div>
+                        </div>
+
+                        <div class="stat-card">
+                            <div class="stat-icon icon-green"><i class="fa-solid fa-head-side-mask"></i></div>
+                            <div class="stat-details">
+                                <span class="stat-number green-text" id="statCompliant">0</span>
+                                <span class="stat-label">Mask Compliant</span>
+                            </div>
+                        </div>
+
+                        <div class="stat-card">
+                            <div class="stat-icon icon-red"><i class="fa-solid fa-triangle-exclamation"></i></div>
+                            <div class="stat-details">
+                                <span class="stat-number red-text" id="statViolations">0</span>
+                                <span class="stat-label">Safety Violations</span>
+                            </div>
+                        </div>
+
+                        <div class="stat-card">
+                            <div class="stat-icon icon-cyan"><i class="fa-solid fa-percent"></i></div>
+                            <div class="stat-details">
+                                <span class="stat-number cyan-text" id="statRate">0%</span>
+                                <span class="stat-label">Compliance Rate</span>
+                            </div>
+                        </div>
+                    </div>
+                </main>
+            </div>
+        </div>
+
+        <!-- Tab 2: Model Analytics -->
+        <div class="tab-content hidden" id="tab-analytics">
+            <div class="analytics-grid">
+                <!-- Confusion Matrix Card -->
+                <div class="glass-card analytics-card">
+                    <h3><i class="fa-solid fa-border-all"></i> Confusion Matrix (Test Set Evaluation)</h3>
+                    <p class="section-desc">Multi-class validation performance on test samples (`With Mask`, `Without Mask`, `Mask Incorrect`).</p>
+                    <div class="matrix-table-wrapper">
+                        <table class="matrix-table">
+                            <thead>
+                                <tr>
+                                    <th>True \ Predicted</th>
+                                    <th>With Mask</th>
+                                    <th>Without Mask</th>
+                                    <th>Mask Incorrect</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td class="row-label">With Mask</td>
+                                    <td class="match-cell">22 (100%)</td>
+                                    <td class="zero-cell">0</td>
+                                    <td class="zero-cell">0</td>
+                                </tr>
+                                <tr>
+                                    <td class="row-label">Without Mask</td>
+                                    <td class="zero-cell">0</td>
+                                    <td class="match-cell">23 (100%)</td>
+                                    <td class="zero-cell">0</td>
+                                </tr>
+                                <tr>
+                                    <td class="row-label">Mask Incorrect</td>
+                                    <td class="zero-cell">0</td>
+                                    <td class="zero-cell">0</td>
+                                    <td class="match-cell">23 (100%)</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- Metrics Report Card -->
+                <div class="glass-card analytics-card">
+                    <h3><i class="fa-solid fa-list-check"></i> Pattern Recognition Classification Metrics</h3>
+                    <p class="section-desc">Precision, Recall, F1-Score, and Support calculated across test evaluation data.</p>
+                    <table class="metrics-table">
+                        <thead>
+                            <tr>
+                                <th>Class</th>
+                                <th>Precision</th>
+                                <th>Recall</th>
+                                <th>F1-Score</th>
+                                <th>Support</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td><span class="tag tag-green">With Mask</span></td>
+                                <td>1.00</td>
+                                <td>1.00</td>
+                                <td>1.00</td>
+                                <td>22</td>
+                            </tr>
+                            <tr>
+                                <td><span class="tag tag-red">Without Mask</span></td>
+                                <td>1.00</td>
+                                <td>1.00</td>
+                                <td>1.00</td>
+                                <td>23</td>
+                            </tr>
+                            <tr>
+                                <td><span class="tag tag-yellow">Mask Incorrect</span></td>
+                                <td>1.00</td>
+                                <td>1.00</td>
+                                <td>1.00</td>
+                                <td>23</td>
+                            </tr>
+                            <tr class="highlight-row">
+                                <td><strong>Overall Accuracy</strong></td>
+                                <td colspan="3"><strong>100.00%</strong></td>
+                                <td><strong>68</strong></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- Tab 3: CNN Architecture -->
+        <div class="tab-content hidden" id="tab-architecture">
+            <div class="glass-card arch-card">
+                <h3><i class="fa-solid fa-brain"></i> Deep Learning CNN Model Architecture Summary</h3>
+                <p class="section-desc">Custom 3-Block Deep Convolutional Network implemented in PyTorch (`FaceMaskCNN`).</p>
+                
+                <div class="arch-pipeline">
+                    <div class="arch-step">
+                        <div class="step-num">01</div>
+                        <div class="step-title">Input Preprocessing</div>
+                        <div class="step-desc">128x128x3 RGB Tensor<br>ImageNet Normalization</div>
+                    </div>
+                    <div class="arch-arrow"><i class="fa-solid fa-chevron-right"></i></div>
+
+                    <div class="arch-step">
+                        <div class="step-num">02</div>
+                        <div class="step-title">Conv Block 1</div>
+                        <div class="step-desc">32 Filters (3x3)<br>BatchNorm + ReLU + MaxPool</div>
+                    </div>
+                    <div class="arch-arrow"><i class="fa-solid fa-chevron-right"></i></div>
+
+                    <div class="arch-step">
+                        <div class="step-num">03</div>
+                        <div class="step-title">Conv Block 2</div>
+                        <div class="step-desc">64 Filters (3x3)<br>BatchNorm + ReLU + MaxPool</div>
+                    </div>
+                    <div class="arch-arrow"><i class="fa-solid fa-chevron-right"></i></div>
+
+                    <div class="arch-step">
+                        <div class="step-num">04</div>
+                        <div class="step-title">Conv Block 3</div>
+                        <div class="step-desc">128 Filters (3x3)<br>BatchNorm + ReLU + MaxPool</div>
+                    </div>
+                    <div class="arch-arrow"><i class="fa-solid fa-chevron-right"></i></div>
+
+                    <div class="arch-step highlight-step">
+                        <div class="step-num">05</div>
+                        <div class="step-title">Dense Classifier</div>
+                        <div class="step-desc">Dropout(0.4) -> Linear(256)<br>Dropout(0.3) -> Linear(3)</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <p>AegisVision Public Safety System • Pattern Recognition Practical 09 • Powered by PyTorch & OpenCV</p>
+    </footer>
+
+    <!-- Custom JS -->
+    <script src="/static/js/app.js"></script>
+</body>
+</html>
