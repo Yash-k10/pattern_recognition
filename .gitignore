@@ -2,3 +2,7 @@ __pycache__/
 *.pyc
 .ipynb_checkpoints/
 *.log
+*.pth
+Open_ended/model/hand_landmarker.task
+Open_ended/model/gesture_classifier.pkl
+Open_ended/data/

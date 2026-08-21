@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="GestureSense - Real-time hand gesture recognition using MediaPipe and machine learning">
+    <title>GestureSense — Hand Gesture Recognition</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/static/css/style.css">
+</head>
+<body>
+    <!-- Animated Background Particles -->
+    <div class="bg-particles" id="bgParticles"></div>
+
+    <!-- Header -->
+    <header class="header">
+        <div class="header-inner">
+            <div class="logo">
+                <div class="logo-icon">
+                    <svg viewBox="0 0 40 40" fill="none">
+                        <path d="M20 4C14 4 10 8 10 14V22C10 28 14 34 20 36C26 34 30 28 30 22V14C30 8 26 4 20 4Z" stroke="url(#logoGrad)" stroke-width="2.5" fill="none"/>
+                        <circle cx="15" cy="14" r="2" fill="url(#logoGrad)"/>
+                        <circle cx="25" cy="14" r="2" fill="url(#logoGrad)"/>
+                        <circle cx="20" cy="20" r="2" fill="url(#logoGrad)"/>
+                        <circle cx="15" cy="26" r="2" fill="url(#logoGrad)"/>
+                        <circle cx="25" cy="26" r="2" fill="url(#logoGrad)"/>
+                        <line x1="15" y1="14" x2="20" y2="20" stroke="url(#logoGrad)" stroke-width="1.5" opacity="0.5"/>
+                        <line x1="25" y1="14" x2="20" y2="20" stroke="url(#logoGrad)" stroke-width="1.5" opacity="0.5"/>
+                        <line x1="20" y1="20" x2="15" y2="26" stroke="url(#logoGrad)" stroke-width="1.5" opacity="0.5"/>
+                        <line x1="20" y1="20" x2="25" y2="26" stroke="url(#logoGrad)" stroke-width="1.5" opacity="0.5"/>
+                        <defs>
+                            <linearGradient id="logoGrad" x1="0" y1="0" x2="40" y2="40">
+                                <stop offset="0%" stop-color="#f97316"/>
+                                <stop offset="100%" stop-color="#ff6b00"/>
+                            </linearGradient>
+                        </defs>
+                    </svg>
+                </div>
+                <div class="logo-text">
+                    <h1>GestureSense</h1>
+                    <span class="logo-subtitle">Hand Gesture Recognition</span>
+                </div>
+            </div>
+            <div class="header-status">
+                <div class="status-dot" id="statusDot"></div>
+                <span id="statusText">Initializing...</span>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="main-content">
+        <!-- Left Panel: Camera Feed -->
+        <section class="camera-section">
+            <div class="section-header">
+                <h2>📹 Live Camera Feed</h2>
+                <div class="camera-controls">
+                    <button class="btn btn-primary" id="startBtn" onclick="toggleCamera()">
+                        <span class="btn-icon">▶</span> Start Camera
+                    </button>
+                    <button class="btn btn-ghost" id="flipBtn" onclick="flipCamera()" style="display:none;">
+                        <span class="btn-icon">🔄</span> Flip
+                    </button>
+                </div>
+            </div>
+            <div class="camera-container">
+                <video id="webcam" autoplay playsinline></video>
+                <canvas id="overlay" class="overlay-canvas"></canvas>
+                <div class="camera-placeholder" id="cameraPlaceholder">
+                    <div class="placeholder-icon">🖐️</div>
+                    <p>Click <strong>Start Camera</strong> to begin</p>
+                    <p class="placeholder-sub">Show your hand to the camera to recognize gestures</p>
+                </div>
+                <!-- Gesture Badge Overlay -->
+                <div class="gesture-badge" id="gestureBadge" style="display:none;">
+                    <span class="gesture-emoji" id="gestureEmoji">🖐️</span>
+                    <span class="gesture-label" id="gestureLabel">---</span>
+                </div>
+            </div>
+        </section>
+
+        <!-- Right Panel: Results & Controls -->
+        <section class="results-section">
+            <!-- Current Gesture Card -->
+            <div class="card gesture-card">
+                <div class="card-header">
+                    <h3>🎯 Detected Gesture</h3>
+                </div>
+                <div class="card-body">
+                    <div class="gesture-display">
+                        <div class="gesture-icon-large" id="gestureIconLarge">❓</div>
+                        <div class="gesture-name" id="gestureName">No Hand Detected</div>
+                        <div class="confidence-bar-container">
+                            <div class="confidence-label">
+                                <span>Confidence</span>
+                                <span id="confidenceValue">0%</span>
+                            </div>
+                            <div class="confidence-bar">
+                                <div class="confidence-fill" id="confidenceFill" style="width: 0%"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Gesture Reference Card -->
+            <div class="card reference-card">
+                <div class="card-header">
+                    <h3>✋ Supported Gestures</h3>
+                </div>
+                <div class="card-body">
+                    <div class="gesture-grid">
+                        <div class="gesture-item" data-gesture="Open Palm">
+                            <span class="gesture-ref-icon">🖐️</span>
+                            <span class="gesture-ref-name">Open Palm</span>
+                        </div>
+                        <div class="gesture-item" data-gesture="Fist">
+                            <span class="gesture-ref-icon">✊</span>
+                            <span class="gesture-ref-name">Fist</span>
+                        </div>
+                        <div class="gesture-item" data-gesture="Thumbs Up">
+                            <span class="gesture-ref-icon">👍</span>
+                            <span class="gesture-ref-name">Thumbs Up</span>
+                        </div>
+                        <div class="gesture-item" data-gesture="Peace">
+                            <span class="gesture-ref-icon">✌️</span>
+                            <span class="gesture-ref-name">Peace</span>
+                        </div>
+                        <div class="gesture-item" data-gesture="OK">
+                            <span class="gesture-ref-icon">👌</span>
+                            <span class="gesture-ref-name">OK</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Stats Card -->
+            <div class="card stats-card">
+                <div class="card-header">
+                    <h3>📊 Session Statistics</h3>
+                </div>
+                <div class="card-body">
+                    <div class="stats-grid">
+                        <div class="stat-item">
+                            <div class="stat-value" id="statFrames">0</div>
+                            <div class="stat-label">Frames Processed</div>
+                        </div>
+                        <div class="stat-item">
+                            <div class="stat-value" id="statDetections">0</div>
+                            <div class="stat-label">Hands Detected</div>
+                        </div>
+                        <div class="stat-item">
+                            <div class="stat-value" id="statFps">0</div>
+                            <div class="stat-label">FPS</div>
+                        </div>
+                        <div class="stat-item">
+                            <div class="stat-value" id="statModel">RF</div>
+                            <div class="stat-label">Classifier</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Data Collection Card -->
+            <div class="card collect-card">
+                <div class="card-header">
+                    <h3>🗂️ Data Collection & Training</h3>
+                    <button class="btn btn-sm btn-accent" id="trainBtn" onclick="retrainModel()">
+                        ⚡ Retrain Model
+                    </button>
+                </div>
+                <div class="card-body">
+                    <p class="collect-info">Select a gesture label, then click <strong>Collect Sample</strong> to save the current hand pose for retraining.</p>
+                    <div class="collect-controls">
+                        <select id="gestureSelect" class="gesture-select">
+                            <option value="Open Palm">🖐️ Open Palm</option>
+                            <option value="Fist">✊ Fist</option>
+                            <option value="Thumbs Up">👍 Thumbs Up</option>
+                            <option value="Peace">✌️ Peace</option>
+                            <option value="OK">👌 OK</option>
+                        </select>
+                        <button class="btn btn-secondary" id="collectBtn" onclick="collectSample()">
+                            📸 Collect Sample
+                        </button>
+                    </div>
+                    <div class="collect-status" id="collectStatus"></div>
+                    <div class="training-result" id="trainingResult" style="display:none;"></div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- Toast Notification -->
+    <div class="toast-container" id="toastContainer"></div>
+
+    <script src="/static/js/app.js"></script>
+</body>
+</html>
